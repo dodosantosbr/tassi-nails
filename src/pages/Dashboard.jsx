@@ -3,11 +3,12 @@ import { useApp } from "../context/AppContext";
 import StatCard from "../components/dashboard/StatCard";
 import PieChart from "../components/dashboard/PieChart";
 
-const mockGanhos = [
-  { label: "Manutenção", value: 120, color: "#e11d5a" },
-  { label: "Acrílico", value: 200, color: "#ff9db6" },
-  { label: "Gel/Acrigel", value: 120, color: "#f43f72" },
-];
+const CORES_SERVICO = {
+  Manutenção: "#e11d5a",
+  Acrílico: "#ff9db6",
+  Gel: "#f43f72",
+  Acrigel: "#fb7aa8",
+};
 
 function isMesmoDia(dataISO, date) {
   const d = new Date(dataISO + "T00:00:00");
@@ -64,7 +65,20 @@ export default function Dashboard() {
   );
   const totalAgendamentos = agendamentosFiltrados.length;
 
-  const totalGanhos = mockGanhos.reduce((acc, g) => acc + g.value, 0);
+  // Ganhos por serviço calculados dinamicamente
+  const ganhosPorServico = Object.entries(
+    agendamentosFiltrados.reduce((acc, a) => {
+      if (!a.servico || !a.valor) return acc;
+      acc[a.servico] = (acc[a.servico] || 0) + Number(a.valor);
+      return acc;
+    }, {}),
+  ).map(([label, value]) => ({
+    label,
+    value,
+    color: CORES_SERVICO[label] ?? "#e11d5a",
+  }));
+
+  const totalGanhos = ganhosPorServico.reduce((acc, g) => acc + g.value, 0);
 
   const labelPeriodo = {
     hoje: "de hoje",
@@ -74,7 +88,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 md:p-8 min-h-screen bg-gradient-to-br from-[#fff1f5] via-white to-[#ffe4ec]">
-      {/* HEADER PREMIUM */}
+      {/* HEADER */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
@@ -85,7 +99,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Filtro Premium */}
         <div className="flex gap-2 bg-white/70 backdrop-blur-md p-1 rounded-full border border-white/60 shadow-lg">
           {["hoje", "semana", "mês"].map((p) => (
             <button
@@ -115,7 +128,6 @@ export default function Dashboard() {
             subColor="text-emerald-500"
           />
         </div>
-
         <div className="transform hover:scale-[1.02] transition">
           <StatCard
             icon="📅"
@@ -124,22 +136,12 @@ export default function Dashboard() {
             sub={`${confirmados} confirmados`}
           />
         </div>
-
         <div className="transform hover:scale-[1.02] transition">
           <StatCard
             icon="⏳"
             label="Pendentes"
             value={pendentes}
             sub="Aguardando confirmação"
-          />
-        </div>
-
-        <div className="transform hover:scale-[1.02] transition">
-          <StatCard
-            icon="⭐"
-            label="Avaliação média"
-            value="4.9"
-            sub="Baseado em 38 avaliações"
           />
         </div>
       </div>
@@ -157,7 +159,14 @@ export default function Dashboard() {
             </span>
           </div>
 
-          <PieChart data={mockGanhos} total={totalGanhos} />
+          {ganhosPorServico.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-14 text-gray-300">
+              <span className="text-6xl mb-4">📊</span>
+              <p className="text-sm">Nenhum dado {labelPeriodo}</p>
+            </div>
+          ) : (
+            <PieChart data={ganhosPorServico} total={totalGanhos} />
+          )}
         </div>
 
         {/* CARD LISTA */}
@@ -188,19 +197,16 @@ export default function Dashboard() {
                       {a.hora}
                     </span>
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800 truncate">
                       {a.nome}
                     </p>
                     <p className="text-xs text-gray-400 mt-0.5">{a.servico}</p>
                   </div>
-
                   <div className="text-right">
                     <p className="text-sm font-bold text-rose-600">
                       R$ {a.valor}
                     </p>
-
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full font-semibold mt-1 inline-block
                       ${
