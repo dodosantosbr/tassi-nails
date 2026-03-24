@@ -78,6 +78,15 @@ export default function Agenda() {
     setDiaSelecionado(dia);
     setCalAberto(false);
   }
+  function formatarTelefone(valor) {
+    const numeros = valor.replace(/\D/g, "").slice(0, 11);
+    if (numeros.length <= 2) return `(${numeros}`;
+    if (numeros.length <= 7)
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+    if (numeros.length <= 11)
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+    return valor;
+  }
 
   return (
     <div className="p-4 md:p-8">
@@ -204,7 +213,10 @@ export default function Agenda() {
               placeholder="(00) 00000-0000"
               value={form.telefone}
               onChange={(e) =>
-                setForm((p) => ({ ...p, telefone: e.target.value }))
+                setForm((p) => ({
+                  ...p,
+                  telefone: formatarTelefone(e.target.value),
+                }))
               }
               className="w-full border border-rose-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-400 transition-all"
             />

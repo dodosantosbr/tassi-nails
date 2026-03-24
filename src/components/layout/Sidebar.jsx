@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import logo from "../../assets/logo.png";
 
 const NAV_ITEMS = [
   { to: "/", icon: "◈", label: "Dashboard" },
@@ -17,18 +18,16 @@ export default function Sidebar({ aberto, onFechar }) {
     `}
     >
       {/* Logo */}
-      <div className="px-6 py-7 border-b border-rose-100 flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-xl font-semibold text-rose-700 tracking-tight">
-            Nail<span className="text-amber-400">Studio</span>
-          </h1>
-          <p className="text-xs text-gray-400 tracking-widest uppercase mt-1">
-            Pro
-          </p>
-        </div>
+      <div className="px-6 py-6 border-b border-rose-100 flex flex-col items-center justify-center">
+        <img
+          src={logo}
+          alt="NailStudio Pro"
+          className="h-24 max-w-[200px] object-contain"
+        />
+
         <button
           onClick={onFechar}
-          className="md:hidden text-gray-400 hover:text-rose-500 text-lg"
+          className="md:hidden mt-3 text-gray-400 hover:text-rose-500 text-lg"
         >
           ✕
         </button>
