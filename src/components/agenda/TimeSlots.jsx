@@ -9,9 +9,7 @@ export default function TimeSlots({ horarios, agendamentos, onSlotClick }) {
   return (
     <div className="flex flex-col gap-1">
       {horarios.map((hora, i) => {
-        const appt = agendamentos.find(
-          (a) => formatHora(a.hora) === formatHora(hora),
-        );
+        const appt = agendamentos.find((a) => a.hora?.slice(0, 5) === hora);
         const cor = i % 3;
 
         return (
