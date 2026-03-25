@@ -27,10 +27,9 @@ export function useAgenda(diaSelecionado = new Date()) {
   const pendentes = agendamentosDoDia.filter(
     (a) => a.status === "pendente",
   ).length;
-  const totalDia = agendamentosDoDia.reduce(
-    (acc, a) => acc + Number(a.valor),
-    0,
-  );
+  const totalDia = agendamentosDoDia
+    .filter((a) => a.status !== "cancelado") // 👈 linha nova
+    .reduce((acc, a) => acc + Number(a.valor), 0);
 
   return {
     agendamentos,
